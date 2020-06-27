@@ -46,9 +46,9 @@ const dynaliteInstance = dynalite({
   updateTableMs: 0
 });
 
-const dbClient = (): AWS.DynamoDB =>
+const dbClient = async (): Promise<AWS.DynamoDB> =>
   new AWS.DynamoDB({
-    endpoint: `localhost:${getDynalitePort()}`,
+    endpoint: `localhost:${await getDynalitePort()}`,
     sslEnabled: false,
     region: "local"
   });
@@ -112,8 +112,8 @@ export const stop = (): Promise<void> =>
 
 export const deleteTables = async (): Promise<void> =>
   runWithRealTimers(async () => {
-    const dynamoDB = dbClient();
-    const tables = getTables();
+    const dynamoDB = await dbClient();
+    const tables = await getTables();
     await Promise.all(
       tables.map(table =>
         dynamoDB
@@ -129,8 +129,8 @@ export const deleteTables = async (): Promise<void> =>
 
 export const createTables = async (): Promise<void> =>
   runWithRealTimers(async () => {
-    const dynamoDB = dbClient();
-    const tables = getTables();
+    const dynamoDB = await dbClient();
+    const tables = await getTables();
 
     await Promise.all(
       tables.map(table => dynamoDB.createTable(table).promise())

@@ -7,13 +7,11 @@ interface Config {
   basePort?: number;
 }
 
-const loadConfig = (configFile: string): Config =>
-  fs.existsSync(configFile)
-    ? JSON.parse(fs.readFileSync(configFile).toString())
-    : {};
+const loadConfig = async (configFile: string): Promise<Config> =>
+  fs.existsSync(configFile) ? import(configFile) : {};
 
 const configFile = (configDir: string): string =>
-  resolve(configDir, "jest-dynalite-config.json");
+  resolve(configDir, "jest-dynalite-config.js");
 
 let config = loadConfig(configFile(process.cwd()));
 
@@ -21,8 +19,9 @@ export const setConfigDir = (configDir: string): void => {
   config = loadConfig(configFile(configDir));
 };
 
-export const getDynalitePort = (): number =>
-  (config.basePort || 8000) +
+export const getDynalitePort = async (): Promise<number> =>
+  ((await config).basePort || 8000) +
   parseInt(process.env.JEST_WORKER_ID as string, 10);
 
-export const getTables = (): CreateTableInput[] => config.tables || [];
+export const getTables = async (): Promise<CreateTableInput[]> =>
+  (await config).tables || [];

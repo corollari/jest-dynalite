@@ -1,9 +1,10 @@
 import { setConfigDir, getDynalitePort } from "./config";
 
-export default (withConfigDir: string): void => {
+export default async (withConfigDir: string): Promise<void> => {
   setConfigDir(withConfigDir);
 
-  const port = getDynalitePort();
+  const port = await getDynalitePort();
+  console.log(port);
 
   // Provide environment variables before other scripts are executed
   process.env.MOCK_DYNAMODB_PORT = port.toString();
